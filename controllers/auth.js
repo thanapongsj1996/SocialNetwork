@@ -38,10 +38,11 @@ exports.signin = (req, res) => {
         const { _id, name, email } = user
         return res.json({ token, user: { _id, name, email } })
     })
+}
 
-
-
-
-
-
+exports.signout = (req, res) => {
+    res.clearCookie('t')
+    return res.json({
+        message: 'Signout success!'
+    })
 }

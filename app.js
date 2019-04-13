@@ -9,7 +9,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 // database
-mongoose.connect(process.env.MONGO_URI, {useNewUrlParser: true}).then(() => { console.log('Database Connected') })
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true }).then(() => { console.log('Database Connected') })
 
 mongoose.connection.on('error', err => {
     console.log(`Database connection error: ${err.message}`)
@@ -26,6 +26,13 @@ app.use(cookieParser())
 app.use(expressValidator())
 app.use('/', postRoutes)
 app.use('/', authRoutes)
+app.use(function (err, req, res, next) {
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).json({
+            error: 'Unauthorized!'
+        })
+    }
+})
 
 const port = process.env.PORT
 app.listen(port, () => {

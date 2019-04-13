@@ -1,7 +1,7 @@
 const Post = require('../models/post')
 
 exports.getPosts = (req, res) => {
-    const posts = Post.find().select('_id title body')
+    Post.find({}, { _id: 1, title: 1, body: 1 })
         .then((posts) => {
             res.json({ posts })
         })

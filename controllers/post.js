@@ -6,7 +6,7 @@ exports.getPosts = (req, res) => {
     Post.find((err, posts) => {
         if (err) { return res.status(403).json({ error: err }) }
         res.json({ posts })
-    }).select('_id title body')
+    }).populate('postedBy', '_id name').select('_id title body')
 }
 
 exports.createPost = (req, res) => {
@@ -23,7 +23,7 @@ exports.createPost = (req, res) => {
         req.profile.hashed_password = undefined
         req.profile.salt = undefined
         post.postedBy = req.profile
-        
+
         if (files.photo) {
             post.photo.data = fs.readFileSync(files.photo.path)
             psot.photo.contenType = files.photo.type

@@ -1,6 +1,21 @@
 const Post = require('../models/post')
 const formidable = require('formidable')
 const fs = require('fs')
+const _ = require('lodash')
+
+exports.postById = (req, res, next, id) => {
+    Post.findById(id)
+        .populate('postedBy', '_id name')
+        .exec((err, post) => {
+            if (err || !post) {
+                return res.status(400).json({
+                    error: err
+                })
+            }
+            req.post = post
+            next()
+        })
+}
 
 exports.getPosts = (req, res) => {
     Post.find((err, posts) => {
@@ -44,11 +59,36 @@ exports.postsByUser = (req, res) => {
         .populate('postedBy', '_id name')
         .sort('_created')
         .exec((err, posts) => {
-            if(err){
+            if (err) {
                 return res.status(400).json({
                     error: err
                 })
             }
             res.json(posts)
         })
+}
+
+exports.isPoster = (req, res, next) => {
+    let isPoster = req.post && req.auth && req.post.postedBy._id == req.auth._id
+    if (!isPoster) {
+        return res.status(403).json({
+            error: 'User is not authrized.'
+        })
+    }
+    next()
+}
+
+
+exports.deletePost = (req, res) => {
+    let post = req.post
+    post.remove((err) => {
+        if (err) {
+            return res.status(400).json({
+                error: err
+            })
+        }
+        res.json({
+            message: 'Post deleted successfully.'
+        })
+    })
 }

@@ -38,3 +38,17 @@ exports.createPost = (req, res) => {
         })
     })
 }
+
+exports.postsByUser = (req, res) => {
+    Post.find({ postedBy: req.profile._id })
+        .populate('postedBy', '_id name')
+        .sort('_created')
+        .exec((err, posts) => {
+            if(err){
+                return res.status(400).json({
+                    error: err
+                })
+            }
+            res.json(posts)
+        })
+}
